@@ -9,6 +9,8 @@ services:
 
   fluentd: 
     build: ./fluentd
+    volumes:
+      - ./fluentd/log:/fluentd/log/dummy.log 
     links: # Sends incoming logs to the elasticsearch container.
       - elasticsearch
     depends_on:
