@@ -21,7 +21,7 @@ services:
 
 
   elasticsearch:
-    image: elasticsearch:7.17.0
+    image: elasticsearch:7.10.1
     expose: # Exposes the default port 9200
       - 9200
     environment:
@@ -31,7 +31,7 @@ services:
 
 
   kibana:
-    image: kibana:7.17.0
+    image: kibana:7.10.1
     links: # Links kibana service to the elasticsearch container
       - elasticsearch
     depends_on:
