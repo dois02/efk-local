@@ -32,7 +32,7 @@ log_structure = {
 }
 
 # Create a file handler to append logs to the dummy.log file
-file_handler = logging.FileHandler('/app/dummy.log', mode='a')
+file_handler = logging.FileHandler('/app/fluentd/log/dummy.log', mode='a')
 file_handler.setFormatter(logging.Formatter('%(message)s'))
 logging.getLogger().addHandler(file_handler)
 

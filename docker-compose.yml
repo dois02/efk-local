@@ -1,42 +1,39 @@
-version: "3"
+version: '3'
 
-# Define the Docker volume named esdata for the Elasticsearch container.
-volumes:
-  esdata:
-
-# Deploying three container services (fluentd, elasticsearch, and kibana)
 services:
-
-  fluentd: 
-    build: ./fluentd
+  fluentd:
+    build:
+      context: .
+    networks:
+      - shared-network
     volumes:
-      - ./fluentd/log:/fluentd/log/dummy.log 
-    links: # Sends incoming logs to the elasticsearch container.
-      - elasticsearch
-    depends_on:
-      - elasticsearch
-    ports: # Exposes the port 24224 on both TCP and UDP protocol for log aggregation
-      - 24224:24224
-      - 24224:24224/udp
-
+      - C:\Users\VASU03\Documents\ekf\efk-local\fluentd:/app/fluentd
+    command: /bin/sh -c "python3 /app/dummy_logs.py & fluentd -c /app/fluentd/fluentd.conf"
+  
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
 
   elasticsearch:
-    image: elasticsearch:7.10.1
-    expose: # Exposes the default port 9200
-      - 9200
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    networks:
+      - shared-network
+    ports:
+      - "9200:9200"
     environment:
-      - discovery.type=single-node # Runs as a single-node
-    volumes: # Stores elasticsearch data locally on the esdata Docker volume
-      - esdata:/usr/share/elasticsearch/data
-
-
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      discovery.type: "single-node"
+      node.store.allow_mmap: "false"
+      
   kibana:
-    image: kibana:7.10.1
-    links: # Links kibana service to the elasticsearch container
-      - elasticsearch
+    image: docker.elastic.co/kibana/kibana:7.10.1
+    networks:
+      - shared-network
+    ports:
+      - "5601:5601"
     depends_on:
       - elasticsearch
-    ports: # Runs kibana service on default port 5601
-      - 5601:5601
-    environment: # Defined host configuration
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+networks:
+  shared-network:
+    driver: bridge
